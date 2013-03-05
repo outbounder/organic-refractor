@@ -1,0 +1,35 @@
+{
+  "Logger": {
+    "source": "node_modules/organic-webcell/membrane/Logger",
+    "listenUncaughtExceptions": true,
+    "prefixConsoleWithTimestamps": true
+  },
+  "HttpServer": {
+    "source": "node_modules/organic-webcell/membrane/ExpressHttpServer",
+    "port": 3334,
+    "middleware": [
+      "node_modules/organic-webcell/membrane/expressMiddleware/cookieParser",
+      "node_modules/organic-webcell/membrane/expressMiddleware/allowCrossDomain",
+      { 
+        "source": "node_modules/organic-webcell/membrane/expressMiddleware/staticFolder", 
+        "staticDir": "public/"
+      },{ 
+        "source": "node_modules/organic-webcell/membrane/expressMiddleware/staticFolder", 
+        "staticDir": "style/"
+      },{ 
+        "source": "node_modules/organic-webcell/membrane/expressMiddleware/bodyParser", 
+        "uploadDir": "uploads/",
+        "keepExtensions": true
+      }
+    ]
+  },
+  "WebSocketServer": {
+    "source": "node_modules/organic-webcell/membrane/WebSocketServer",
+    "attachToChemical": "HttpServer",
+    "events": {}
+  },
+  "Tissue": {
+    "source": "node_modules/organic-cells/membrane/Tissue",
+    "bindTo": "archconsole"
+  }
+}
