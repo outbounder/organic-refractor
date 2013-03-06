@@ -59,6 +59,7 @@ var findFilesDependingOnAndRefractor = function(from, to, entries, callback) {
           if(err) return callback(err);
           var content = data.toString();
           for(var i = 0; i<deps.length; i++) {
+            if(deps[i].core) continue;
             var relative = "./"+path.relative(path.dirname(to), deps[i].filename);
             content = content.replace(deps[i].id, relative);
           }

@@ -19,7 +19,7 @@
     "source": "node_modules/organic-webcell/plasma/ErrorHandler"
   },
   "SocketIOActions": {
-    "source": "plasma/SocketIOActions",
+    "source": "node_modules/organic-webcell/plasma/SocketIOActions",
     "cwd": {
       "actions": "/io-actions"
     }

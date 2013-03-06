@@ -1,8 +1,8 @@
 var path = require("path");
 
 module.exports = Backbone.View.extend({
-  template: jadeCompile(require("./action-request.jade")),
-  actionChanges: jadeCompile(require("./action-request-changes.jade")),
+  template: jadeCompile(require("./index.jade")),
+  actionChanges: jadeCompile(require("./changes.jade")),
   events: {
     "click .executeBtn": "execute",
     "click .file": "showFile",
