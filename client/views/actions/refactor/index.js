@@ -10,13 +10,14 @@ module.exports = Backbone.View.extend({
     "click .cancelBtn": "remove"
   },
   initialize: function(){
-    var type = this.model.get("moved_node").type;
+    var type = this.type = this.model.get("moved_node").type;
     var self = this;
     var from = this.model.get("moved_node").path;
     var eventName = "GET /refractor/"+type;
     runtime.plasma.emit(eventName, {from: from}, function(err, files){
-      console.log(files);
       if(type == "folder") {
+        console.log(files);
+        self.entries = files;
         self.collection = [].concat(files.files);
         for(var key in files.deps)
           for(var i = 0; i<files.deps[key].length; i++)
@@ -63,7 +64,7 @@ module.exports = Backbone.View.extend({
     runtime.plasma.emit(eventName, {
       from: frompath,
       to: topath,
-      entries: this.collection
+      entries: this.type == "folder"?this.entries:this.collection
     }, function(err, results){
       if(err) return console.log(err);
       self.remove();

@@ -1,4 +1,3 @@
-require("../test-inner");
-require("../../test-as-dep");
-require("../../test-dep1.js");
-require("../../test");
+require("../test-inner.js");
+require("../../test.js");
+require("./index.jade");

@@ -6,7 +6,7 @@ describe("refractor", function(){
 
   it("lists files depending on", function(next){
     actions["GET /folder"]({from: __dirname+"/data/inner/dir"}, function(err, files){
-      expect(files.length).toBe(2);
+      expect(files.files.length).toBe(1);
       listedEntries = files;
       next();
     })
@@ -25,7 +25,7 @@ describe("refractor", function(){
 
   it("lists files depending on again", function(next){
     actions["GET /folder"]({from: __dirname+"/data/dir"}, function(err, files){
-      expect(files.length).toBe(2);
+      expect(files.files.length).toBe(1);
       listedEntries = files;
       next();
     })
