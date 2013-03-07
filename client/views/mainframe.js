@@ -31,23 +31,28 @@ module.exports = Backbone.View.extend({
     $el.find(".icon-folder-close").hide();
     $el.find(".icon-edit").hide();
   },
+
   addRenameRequest: function(e){
     e.preventDefault();
     var self = this;
     if(this.currentActionRequest)
       this.currentActionRequest.remove();
-    this.$(".filecontents").hide();
+
+    var pathToChange = $(e.currentTarget).attr("data-path");
+    var $tree = self.$(".treeview");
+    var node = $tree.tree('getNodeById', pathToChange);
 
     var view = this.currentActionRequest = new RenameActionRequest({model: new Backbone.Model({
-      path: $(e.currentTarget).attr("data-path")
+      path: pathToChange
     })});
     view.on("success", function(path){
-      var $tree = self.$(".treeview");
-      var node = $tree.tree('getNodeById', $(e.currentTarget).attr('data-path'))
-      node.path = path;
-      node.label = _path.basename(path);
-      node.nodeName = node.label;
-      $tree.tree('updateNode', node, self.treeNodeMenu({model: node}));
+      var data = {
+        id: path,
+        path: path,
+        label: _path.basename(path),
+        nodeName: _path.basename(path)
+      };
+      $tree.tree('updateNode', node, data);
     });
     this.$(".actionRequest").html(view.render().$el);
     return false;
@@ -55,24 +60,26 @@ module.exports = Backbone.View.extend({
 
   addFolderRequest: function(e){
     e.preventDefault();
-
+    var self = this;
     if(this.currentActionRequest)
       this.currentActionRequest.remove();
-    this.$(".filecontents").hide();
 
+    var pathToAddFolderTo = $(e.currentTarget).attr("data-path");
+    var $tree = self.$(".treeview");
+    var node = $tree.tree('getNodeById', pathToAddFolderTo);
+    console.log(node);
     var view = this.currentActionRequest = new AddFolderActionRequest({model: new Backbone.Model({
-      path: $(e.currentTarget).attr("data-path")
+      path: pathToAddFolderTo
     })});
     view.on("success", function(path){
-      var $tree = self.$(".treeview");
-      var node = $tree.tree('getNodeById', $(e.currentTarget).attr('data-path'))
-      $tree.tree('appendNode', {
+      var data = {
         path: path,
         label: _path.basename(path),
         id: path,
         type: "folder",
         children: []
-      }, node);
+      };
+      $tree.tree('appendNode', data, node);
     });
     this.$(".actionRequest").html(view.render().$el);
     return false;
@@ -86,37 +93,27 @@ module.exports = Backbone.View.extend({
     }));
     
     this.$(".treeview").tree({
-      data: this.model.currentDirectory.toTreeJSON(function(node){
-        return self.treeNodeMenu({model: node})
-      }),
+      data: this.model.currentDirectory.toTreeJSON(),
       dragAndDrop: true,
       autoOpen: 0,
       selectable: true,
-      autoEscape: false
+      autoEscape: false,
+      onCreateLi: function(node, $li) {
+        $li.find('.jqtree-title').html(self.treeNodeMenu({model: node}));
+      }
     }).bind("tree.move", function(e){
       e.preventDefault();
 
       if(self.currentActionRequest)
         self.currentActionRequest.remove();
-      self.$(".filecontents").hide();
 
       var view = self.currentActionRequest = new ActionRequest({model: new Backbone.Model(e.move_info)});
       view.on("success", function(topath){
-
         // update the path value after refactoring
         e.move_info.moved_node.path = topath; 
         e.move_info.do_move();
       });
       self.$(".actionRequest").html(view.render().$el);
-    }).bind("tree.click", function(e){
-      runtime.plasma.emit("GET /file", {
-        target: e.node.path
-      }, function(err, contents) {
-        if(contents) {
-          self.$(".filecontents").html(contents);
-          self.$(".filecontents").show();
-        }
-      })
     })
     return this;
   }

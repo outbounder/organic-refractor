@@ -11,9 +11,9 @@ module.exports = Backbone.View.extend({
   },
   execute: function(){
     var self = this;
-    var topath = this.$(".path").val();
+    var topath = this.model.get("path")+"/"+this.$(".path").val();
     runtime.plasma.emit("POST /addfolder", {
-      target: this.$(".path").val()
+      target: topath
     }, function(err, results){
       if(err) return console.log(err);
       self.remove();

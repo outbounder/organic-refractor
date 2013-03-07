@@ -12,8 +12,7 @@ module.exports = Backbone.View.extend({
   execute: function(){
     var self = this;
     var frompath = this.model.get("path");
-    var topath = this.$(".path").val();
-    console.log(frompath, topath);
+    var topath = path.dirname(this.model.get("path"))+"/"+this.$(".path").val();
     runtime.plasma.emit("PUT /rename", {
       from: frompath,
       to: topath,
@@ -24,7 +23,10 @@ module.exports = Backbone.View.extend({
     })
   },
   render: function(){
-    this.$el.html(this.template({model: this.model}));
+    this.$el.html(this.template({
+      model: this.model, 
+      basename: path.basename(this.model.get("path"))
+    }));
     return this;
   }
 })
