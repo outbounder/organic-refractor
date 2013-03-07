@@ -107,7 +107,7 @@ module.exports = function(config){
     "POST /file": function(data, callback) {
       refractorFile(data.from, data.to, data.entries, function(v){return v}, function(err, changes){
         if(err) return callback(err);
-        fs.unlink(from, function(err){
+        fs.unlink(data.from, function(err){
           callback(err, changes);
         });
       })
