@@ -5,39 +5,39 @@ describe("refractor", function(){
   var listedEntries;
 
   it("lists files depending on", function(next){
-    actions["GET"]({from: __dirname+"/data/test-dep1.js"}, function(err, files){
-      expect(files.length).toBe(2);
+    actions["GET /file"]({from: __dirname+"/data/test-dep1.js"}, function(err, files){
+      expect(files.length).toBe(3);
       listedEntries = files;
       next();
     })
   })
 
-  it("refractors files", function(next){
-    actions["POST"]({
+  xit("refractors files", function(next){
+    actions["POST /file"]({
       from: __dirname+"/data/test-dep1.js", 
       to: __dirname+"/data/inner/test-dep1.js",
       entries: listedEntries
     }, function(err, files){
-      expect(files.length).toBe(2);
+      expect(files.length).toBe(3);
       next();
     })
   })
 
-  it("lists files depending on again", function(next){
-    actions["GET"]({from: __dirname+"/data/inner/test-dep1.js"}, function(err, files){
-      expect(files.length).toBe(2);
+  xit("lists files depending on again", function(next){
+    actions["GET /file"]({from: __dirname+"/data/inner/test-dep1.js"}, function(err, files){
+      expect(files.length).toBe(3);
       listedEntries = files;
       next();
     })
   })
 
-  it("refractors files back", function(next){
-    actions["POST"]({
+  xit("refractors files back", function(next){
+    actions["POST /file"]({
       from: __dirname+"/data/inner/test-dep1.js", 
       to: __dirname+"/data/test-dep1.js",
       entries: listedEntries
     }, function(err, files){
-      expect(files.length).toBe(2);
+      expect(files.length).toBe(3);
       next();
     })
   })

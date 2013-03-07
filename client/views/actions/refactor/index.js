@@ -10,10 +10,20 @@ module.exports = Backbone.View.extend({
     "click .cancelBtn": "remove"
   },
   initialize: function(){
+    var type = this.model.get("moved_node").type;
     var self = this;
     var from = this.model.get("moved_node").path;
-    runtime.plasma.emit("GET /refractor", {from: from}, function(err, files){
-      self.collection = files;
+    var eventName = "GET /refractor/"+type;
+    runtime.plasma.emit(eventName, {from: from}, function(err, files){
+      console.log(files);
+      if(type == "folder") {
+        self.collection = [].concat(files.files);
+        for(var key in files.deps)
+          for(var i = 0; i<files.deps[key].length; i++)
+            self.collection.push(files.deps[key][i]);
+      } else
+        self.collection = files;
+        
       if(self.collection.length > 0)
         self.$(".files").html(self.actionChanges({collection: self.collection}));
       else
@@ -34,6 +44,7 @@ module.exports = Backbone.View.extend({
   },
   showTargetFile: function(e){
     e.preventDefault();
+    if(this.model.get("moved_node").type == "folder") return;
     var self = this;
     runtime.plasma.emit("GET /file", {
       target: this.model.get("moved_node").path
@@ -48,7 +59,8 @@ module.exports = Backbone.View.extend({
     var self = this;
     var frompath = this.model.get("moved_node").path;
     var topath = this.model.get("target_node").path+"/"+this.$(".filename").val();
-    runtime.plasma.emit("POST /refractor", {
+    var eventName = "POST /refractor/"+this.model.get("moved_node").type;
+    runtime.plasma.emit(eventName, {
       from: frompath,
       to: topath,
       entries: this.collection

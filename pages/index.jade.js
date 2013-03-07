@@ -16,7 +16,7 @@ var User = require("./../client/models/User.js");
 var Router = require("./../client/index.js");
 
 runtime.plasma = io.connect(config.socketio);
-runtime.plasma.emit("GET /user", {}, function(data){
+runtime.plasma.emit("GET ", {}, function(data){
   runtime.user = new User(data);
   runtime.router = new Router();
   Backbone.history.start({pushState: false, trigger: true});

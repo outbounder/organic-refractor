@@ -1,13 +1,13 @@
 .row-fluid
-  .span3.btn.targetFileBtn= model.get("moved_node").nodeName
+  .span3.btn.targetFileBtn= model.get("moved_node").name
   .span3= model.get("position")
-  .span3= model.get("target_node").nodeName
+  .span3= model.get("target_node").name
   .span3
     .btn.executeBtn execute
     .btn.cancelBtn cancel
   .row-fuild
     h2.span2.input save as:
-    input.span12.filename(type="text", value= model.get("moved_node").nodeName)
+    input.span12.filename(type="text", value= model.get("moved_node").name)
   .row-fluid
     h1.span12 Files involved
   .row-fluid

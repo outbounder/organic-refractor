@@ -2,6 +2,8 @@ var _ = require("underscore");
 var fs = require("fs");
 var path = require("path");
 
+// dirTree borrowed from The internet
+var index = {};
 
 var dirTree = function(filename) {
     var stats = fs.lstatSync(filename),
@@ -10,6 +12,7 @@ var dirTree = function(filename) {
       path: filename,
       label: path.basename(filename)
     };
+    index[info.id] = info;
 
     if (stats.isDirectory()) {
       info.type = "folder";
@@ -49,8 +52,13 @@ module.exports = function(data){
   _.extend(this, data);
 }
 
-module.exports.prototype.refreshCWD = function(){
-  this.currentDirectory = dirTree(process.cwd());
+module.exports.prototype.refresh = function(){
+  index = {};
+  this.tree = dirTree(process.cwd());
   this.cwd = process.cwd();
   return this;
+}
+
+module.exports.prototype.pathToNode = function(path) {
+  return index[path];
 }
