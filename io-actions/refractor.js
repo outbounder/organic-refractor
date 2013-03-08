@@ -32,9 +32,12 @@ var dependingFilesCollector = function(from){
       if(!deps || err) return next(null);
       for(var i = 0; i<deps.length; i++)
         if(deps[i].filename == from) {
-          deps[i].path = file;
-          delete deps[i].deps; // we do not care for these...
-          return next(null, deps[i]); // give the reflection dep back
+          var data = {
+            path: file,
+            filename: deps[i].filename,
+            id: deps[i].id
+          }
+          return next(null, data);
         }
       next();
     })
