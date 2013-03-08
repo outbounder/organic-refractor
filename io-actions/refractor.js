@@ -1,5 +1,5 @@
 var runtime = require("../models/runtime");
-var required = require('required');
+var required = require('../xlib/required');
 var path = require("path");
 var async = require("async");
 var shelljs = require('shelljs');

@@ -1,11 +1,12 @@
 var _path = require("path");
 
-var ActionRequest = require("./actions/refactor/index.js");
-var RenameActionRequest = require("./actions/rename/index.js");
-var AddFolderActionRequest = require("./actions/addfolder/index.js");
+var ActionRequest = require("../actions/refactor/index.js");
+var RenameActionRequest = require("../actions/rename/index.js");
+var AddFolderActionRequest = require("../actions/addfolder/index.js");
+var RelatedRequest = require("../actions/related/index.js");
 
 module.exports = Backbone.View.extend({
-  template: jadeCompile(require("./mainframe.jade")),
+  template: jadeCompile(require("./index.jade")),
   treeNodeMenu: jadeCompile(require("./treeNodeMenu.jade")),
 
   events: {
@@ -42,9 +43,7 @@ module.exports = Backbone.View.extend({
     var $tree = self.$(".treeview");
     var node = $tree.tree('getNodeById', pathToChange);
 
-    var view = this.currentActionRequest = new RenameActionRequest({model: new Backbone.Model({
-      path: pathToChange
-    })});
+    var view = this.currentActionRequest = new RenameActionRequest({model: new Backbone.Model(node)});
     view.on("success", function(path){
       var data = {
         id: path,
@@ -119,6 +118,14 @@ module.exports = Backbone.View.extend({
         $tree.tree('updateNode', e.move_info.moved_node, data); 
         e.move_info.do_move();
       });
+      self.$(".actionRequest").html(view.render().$el);
+    }).bind("tree.click", function(e){
+      e.preventDefault();
+
+      if(self.currentActionRequest)
+        self.currentActionRequest.remove();
+
+      var view = self.currentActionRequest = new RelatedRequest({model: new Backbone.Model(e.node)});
       self.$(".actionRequest").html(view.render().$el);
     })
     return this;

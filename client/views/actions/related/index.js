@@ -2,17 +2,15 @@ var path = require("path");
 
 module.exports = Backbone.View.extend({
   template: jadeCompile(require("./index.jade")),
-  actionChanges: jadeCompile(require("./changes.jade")),
+  items: jadeCompile(require("./items.jade")),
   events: {
-    "click .executeBtn": "execute",
     "click .file": "showFile",
     "click .targetFileBtn": "showTargetFile",
-    "click .cancelBtn": "remove"
   },
   initialize: function(){
-    var type = this.type = this.model.get("moved_node").type;
+    var type = this.type = this.model.get("type");
     var self = this;
-    var from = this.model.get("moved_node").path;
+    var from = this.model.get("path");
     var eventName = "GET /refractor/"+type;
     runtime.plasma.emit(eventName, {from: from}, function(err, files){
       if(type == "folder") {
@@ -25,7 +23,7 @@ module.exports = Backbone.View.extend({
         self.collection = files;
         
       if(self.collection.length > 0)
-        self.$(".files").html(self.actionChanges({collection: self.collection}));
+        self.$(".files").html(self.items({collection: self.collection}));
       else
         self.$(".files").html("no files related found");
     });
@@ -40,39 +38,25 @@ module.exports = Backbone.View.extend({
       if(contents) {
         self.$(".selectedFilePath").html($(e.currentTarget).html());
         self.$(".selectedFilecontents").html(contents);
+      } else {
+        self.$(".selectedFilePath").html($(e.currentTarget).html());
+        self.$(".selectedFilecontents").html("empty");
       }
     });
   },
   showTargetFile: function(e){
     e.preventDefault();
-    if(this.model.get("moved_node").type == "folder") return;
-    
+    if(this.model.get("type") == "folder") return;
+
     var self = this;
     runtime.plasma.emit("GET /file", {
-      target: this.model.get("moved_node").path
+      target: this.model.get("path")
     }, function(err, contents) {
       if(contents) {
-        self.$(".selectedFilePath").html(self.model.get("moved_node").path);
+        self.$(".selectedFilePath").html(self.model.get("path"));
         self.$(".selectedFilecontents").html(contents);
       }
     });
-  },
-  execute: function(){
-    var self = this;
-    var frompath = this.model.get("moved_node").path;
-    var topath = this.model.get("target_node").path+"/"+this.$(".filename").val();
-    if(this.model.get("position") == "after" || this.model.get("position") == "before")
-      topath = path.dirname(this.model.get("target_node").path)+"/"+this.$(".filename").val();
-    var eventName = "POST /refractor/"+this.model.get("moved_node").type;
-    runtime.plasma.emit(eventName, {
-      from: frompath,
-      to: topath,
-      entries: this.type == "folder"?this.entries:this.collection
-    }, function(err, results){
-      if(err) return console.log(err);
-      self.remove();
-      self.trigger("success", topath);
-    })
   },
   render: function(){
     this.$el.html(this.template({model: this.model}));
