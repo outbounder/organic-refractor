@@ -1,9 +1,9 @@
 var _path = require("path");
 
-var ActionRequest = require("../actions/refactor/index.js");
-var RenameActionRequest = require("../actions/rename/index.js");
-var AddFolderActionRequest = require("../actions/addfolder/index.js");
-var RelatedRequest = require("../actions/related/index.js");
+var ActionRequest = require("../actions/refactor");
+var RenameActionRequest = require("../actions/rename");
+var AddFolderActionRequest = require("../actions/addfolder");
+var RelatedRequest = require("../actions/related");
 
 module.exports = Backbone.View.extend({
   template: jadeCompile(require("./index.jade")),
