@@ -1,1 +1,1 @@
-var dep = require("../test-dep1.js");
+var dep = require("../test-dep1");

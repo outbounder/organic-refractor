@@ -58,6 +58,10 @@ var refractorFileDependency = function(to, resolveForReal){
       var relative = path.relative(dirname, to);
       if(relative.indexOf(".") !== 0 && relative.indexOf("/") !== 0)
         relative = "./"+relative;
+      if(relative.indexOf("/index.js") !== -1)
+        relative = relative.replace("/index.js", "");
+      if(relative.indexOf(".js") !== -1)
+        relative = relative.replace(".js", "");
       fs.writeFile(entry.path, data.toString().replace(entry.id, relative), function(err){
         next(err, {change: {from: entry.id, to: relative}, sourcefile: entry.path});  
       });
@@ -83,6 +87,10 @@ var refractorFileSelf = function(from, to, resolveForReal, callback){
           var relative = path.relative(path.dirname(to), filename);
           if(relative.indexOf(".") !== 0 && relative.indexOf("/") !== 0)
             relative = "./"+relative;
+          if(relative.indexOf("/index.js") !== -1)
+            relative = relative.replace("/index.js", "");
+          if(relative.indexOf(".js") !== -1)
+            relative = relative.replace(".js", "");
           content = content.replace(deps[i].id, relative);
         }
         shelljs.mkdir('-p', path.dirname(to));

@@ -18,7 +18,7 @@ describe("refractor", function(){
       to: __dirname+"/data/dir",
       entries: listedEntries
     }, function(err, files){
-      expect(files.length).toBe(4);
+      expect(files.length).toBe(5);
       next();
     })
   })
@@ -37,7 +37,7 @@ describe("refractor", function(){
       to: __dirname+"/data/inner/dir",
       entries: listedEntries
     }, function(err, files){
-      expect(files.length).toBe(4);
+      expect(files.length).toBe(5);
       next();
     })
   })

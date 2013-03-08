@@ -1,2 +1,2 @@
-var test = require("./test-as-dep.js");
+var test = require("./test-as-dep");
 module.exports = {}

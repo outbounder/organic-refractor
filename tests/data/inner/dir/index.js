@@ -1,3 +1,3 @@
-require("../test-inner.js");
-require("../../test.js");
+require("../../test-inner");
+require("../test");
 require("./index.jade");
