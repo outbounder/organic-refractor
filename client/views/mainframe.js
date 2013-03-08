@@ -91,8 +91,8 @@ module.exports = Backbone.View.extend({
     this.$el.html(this.template({
       model: this.model
     }));
-    
-    this.$(".treeview").tree({
+    var $tree = self.$(".treeview");
+    $tree.tree({
       data: this.model.currentDirectory.toTreeJSON(),
       dragAndDrop: true,
       autoOpen: 0,
@@ -110,7 +110,13 @@ module.exports = Backbone.View.extend({
       var view = self.currentActionRequest = new ActionRequest({model: new Backbone.Model(e.move_info)});
       view.on("success", function(topath){
         // update the path value after refactoring
-        e.move_info.moved_node.path = topath; 
+        var data = {
+          id: topath,
+          path: topath,
+          label: _path.basename(topath),
+          nodeName: _path.basename(topath)
+        };
+        $tree.tree('updateNode', e.move_info.moved_node, data); 
         e.move_info.do_move();
       });
       self.$(".actionRequest").html(view.render().$el);

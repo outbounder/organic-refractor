@@ -16,7 +16,6 @@ module.exports = Backbone.View.extend({
     var eventName = "GET /refractor/"+type;
     runtime.plasma.emit(eventName, {from: from}, function(err, files){
       if(type == "folder") {
-        console.log(files);
         self.entries = files;
         self.collection = [].concat(files.files);
         for(var key in files.deps)
@@ -60,6 +59,8 @@ module.exports = Backbone.View.extend({
     var self = this;
     var frompath = this.model.get("moved_node").path;
     var topath = this.model.get("target_node").path+"/"+this.$(".filename").val();
+    if(this.model.get("position") == "after" || this.model.get("position") == "before")
+      topath = path.dirname(this.model.get("target_node").path)+"/"+this.$(".filename").val();
     var eventName = "POST /refractor/"+this.model.get("moved_node").type;
     runtime.plasma.emit(eventName, {
       from: frompath,
