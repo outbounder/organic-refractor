@@ -13,7 +13,8 @@ module.exports = Backbone.View.extend({
     "mouseover .node": "showMenu",
     "mouseout .node": "hideMenu",
     "click .node .icon-edit": "addRenameRequest",
-    "click .node .icon-folder-close": "addFolderRequest"
+    "click .node .icon-folder-close": "addFolderRequest",
+    "click .updateBtn": "refreshTree"
   },
   
   initialize: function(options){
@@ -33,6 +34,21 @@ module.exports = Backbone.View.extend({
     $el.find(".icon-edit").hide();
   },
 
+  refreshTree: function(e){
+    if(e) 
+      e.preventDefault();
+    var self = this;
+    var $tree = self.$(".treeview");
+    this.$(".updateBtn").addClass("disabled");
+    runtime.plasma.emit("GET ", {}, function(err, data){
+      if(err) return alert(err);
+      self.model.set(self.model.parse(data), {silent: true});
+      var treedata = self.model.currentDirectory.toTreeJSON();
+      $tree.tree('loadData', treedata);
+      self.$(".updateBtn").removeClass("disabled");
+    });
+  },
+
   addRenameRequest: function(e){
     e.preventDefault();
     var self = this;
@@ -40,18 +56,12 @@ module.exports = Backbone.View.extend({
       this.currentActionRequest.remove();
 
     var pathToChange = $(e.currentTarget).attr("data-path");
-    var $tree = self.$(".treeview");
+    
     var node = $tree.tree('getNodeById', pathToChange);
 
     var view = this.currentActionRequest = new RenameActionRequest({model: new Backbone.Model(node)});
     view.on("success", function(path){
-      var data = {
-        id: path,
-        path: path,
-        label: _path.basename(path),
-        nodeName: _path.basename(path)
-      };
-      $tree.tree('updateNode', node, data);
+      self.refreshTree();
     });
     this.$(".actionRequest").html(view.render().$el);
     return false;
@@ -108,15 +118,7 @@ module.exports = Backbone.View.extend({
 
       var view = self.currentActionRequest = new ActionRequest({model: new Backbone.Model(e.move_info)});
       view.on("success", function(topath){
-        // update the path value after refactoring
-        var data = {
-          id: topath,
-          path: topath,
-          label: _path.basename(topath),
-          nodeName: _path.basename(topath)
-        };
-        $tree.tree('updateNode', e.move_info.moved_node, data); 
-        e.move_info.do_move();
+        self.refreshTree();
       });
       self.$(".actionRequest").html(view.render().$el);
     }).bind("tree.click", function(e){

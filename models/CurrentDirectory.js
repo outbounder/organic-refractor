@@ -70,7 +70,8 @@ module.exports.prototype.toJSON = function(){
     cwd: this.cwd,
     git: {
       status: this.git.status
-    }
+    },
+    timestamp: new Date()
   }
 }
 
