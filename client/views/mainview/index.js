@@ -42,9 +42,7 @@ module.exports = Backbone.View.extend({
     this.$(".updateBtn").addClass("disabled");
     runtime.plasma.emit("GET ", {}, function(err, data){
       if(err) return alert(err);
-      self.model.set(self.model.parse(data), {silent: true});
-      var treedata = self.model.currentDirectory.toTreeJSON();
-      $tree.tree('loadData', treedata);
+      self.model.set(self.model.parse(data));
       self.$(".updateBtn").removeClass("disabled");
     });
   },
