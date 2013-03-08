@@ -25,7 +25,16 @@ module.exports = Backbone.View.extend({
         self.collection = files;
         
       if(self.collection.length > 0)
-        self.$(".files").html(self.actionChanges({collection: self.collection}));
+        self.$(".files").html(self.actionChanges({
+          collection: self.collection,
+          relative: function(file) {
+            var v = path.relative(type=="folder"?from:path.dirname(from), file);
+            if(v.indexOf(".") !== 0 && v.indexOf("/") !== 0)
+              return "./"+v;
+            else
+              return v;
+          }
+        }));
       else
         self.$(".files").html("no files related found");
     });
@@ -34,18 +43,23 @@ module.exports = Backbone.View.extend({
     e.preventDefault();
 
     var self = this;
+    var target = $(e.currentTarget).attr("data-path");
     runtime.plasma.emit("GET /file", {
-      target: $(e.currentTarget).html()
+      target: target
     }, function(err, contents) {
       if(contents) {
-        self.$(".selectedFilePath").html($(e.currentTarget).html());
+        self.$(".selectedFilePath").html(target);
         self.$(".selectedFilecontents").html(contents);
+      } else {
+        self.$(".selectedFilePath").html(target);
+        self.$(".selectedFilecontents").html(err || "empty");
       }
     });
   },
   showTargetFile: function(e){
     e.preventDefault();
-    if(this.model.get("moved_node").type == "folder") return;
+    if(this.model.get("moved_node").type == "folder") 
+      return alert("can't show folder");
     
     var self = this;
     runtime.plasma.emit("GET /file", {

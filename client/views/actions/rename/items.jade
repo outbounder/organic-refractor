@@ -1,4 +1,4 @@
 for file in collection
   .row-fluid
     .span2 filepath:
-    .span10.btn.file= file.path
+    .span10.btn.file(data-path= file.path)= relative(file.path)
