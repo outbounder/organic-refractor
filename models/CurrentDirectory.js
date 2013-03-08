@@ -17,13 +17,8 @@ var dirTree = function(filename) {
     if (stats.isDirectory()) {
       info.type = "folder";
       info.children = fs.readdirSync(filename).map(function(child) {
-        if(child == "node_modules") return {
-          id: filename+"/"+child,
-          path: filename+"/"+child, 
-          label: "node_modules", 
-          type: "folder", 
-          children: []
-        }
+        if(child == "node_modules") return;
+        if(child.indexOf(".") === 0) return;
         
         return dirTree(filename + '/' + child);
       }).sort(function(a,b){
@@ -44,6 +39,9 @@ var dirTree = function(filename) {
       // something else!
       info.type = "file";
     }
+    
+    if(info.children)
+      info.children = _.compact(info.children);
 
     return info;
 }
