@@ -2,6 +2,9 @@
   .nav-inner
     h1 Refractor
     span.info #{model.get("cwd")}
+- if(model.get("git").status.indexOf("nothing to commit") === -1)
+  .row-fluid
+    .span12.alert You have <b> changes to commit </b>
 .row-fluid
   .span3.treeview
   .span9.actionRequest
