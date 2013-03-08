@@ -69,7 +69,10 @@ module.exports = Backbone.View.extend({
       to: topath,
       entries: this.type == "folder"?this.entries:this.collection
     }, function(err, results){
-      if(err) return console.log(err);
+      if(err) {
+        alert(err);
+        return console.log(err);
+      }
       self.remove();
       self.trigger("success", topath);
     })

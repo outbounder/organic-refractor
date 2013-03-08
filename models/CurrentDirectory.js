@@ -1,6 +1,7 @@
 var _ = require("underscore");
 var fs = require("fs");
 var path = require("path");
+var Git = require("git-wrapper");
 
 // dirTree borrowed from The internet
 var index = {};
@@ -50,11 +51,27 @@ module.exports = function(data){
   _.extend(this, data);
 }
 
-module.exports.prototype.refresh = function(){
+module.exports.prototype.refresh = function(callback){
+  var self = this;
   index = {};
   this.tree = dirTree(process.cwd());
   this.cwd = process.cwd();
-  return this;
+  this.git = new Git();
+  this.git.exec("status", function(err, msg){
+    if(err) return callback(err);
+    self.git.status = msg;
+    callback(null, self);
+  })
+}
+
+module.exports.prototype.toJSON = function(){
+  return {
+    tree: this.tree,
+    cwd: this.cwd,
+    git: {
+      status: this.git.status
+    }
+  }
 }
 
 module.exports.prototype.pathToNode = function(path) {

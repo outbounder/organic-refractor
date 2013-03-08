@@ -110,13 +110,19 @@ var refractorFile = function(from, to, entries, resolveForReal, callback) {
 module.exports = function(config){
   return {
     "GET /file": function(data, callback){
-      var tree = runtime.currentDirectory.refresh().tree;
-      findFilesDependingOn(tree, data.from, function(err, files){
-        callback(err, files);
-      })
+      runtime.currentDirectory.refresh(function(err, currentDirectory){
+        if(err) return callback(err);
+        var tree = currentDirectory.tree;
+          findFilesDependingOn(tree, data.from, function(err, files){
+          callback(err, files);
+        });
+      });
     },
     "POST /file": function(data, callback) {
-      refractorFile(data.from, data.to, data.entries, function(v){return v}, function(err, changes){
+      var resolveForReal = function(f){
+        return f;
+      }
+      refractorFile(data.from, data.to, data.entries, resolveForReal, function(err, changes){
         if(err) return callback(err);
         fs.unlink(data.from, function(err){
           callback(err, changes);
@@ -124,54 +130,59 @@ module.exports = function(config){
       })
     },
     "GET /folder": function(data, callback) {
-      var tree = runtime.currentDirectory.refresh().tree;
-      var from = runtime.currentDirectory.pathToNode(data.from);
-      // get all files bellow the dir with .js extension
-      walk(from, function(file, next){
-        next(null, {path: file});
-      }, function(err, files){
-        // get all dependencies (it will be slow...)
-        var fileDeps = {};
-        async.forEach(files, function(file, next){
-          findFilesDependingOn(tree, file.path, function(err, files){
-            if(err) return next(err);
-            fileDeps[file.path] = files;
-            next(null)
-          });
-        }, function(err){
-          if(err) return callback(err);
-          callback(null, {files: files, deps: fileDeps});
+      runtime.currentDirectory.refresh(function(err, currentDirectory){
+        if(err) return callback(err);
+        var tree = currentDirectory.tree;
+        var from = runtime.currentDirectory.pathToNode(data.from);
+        // get all files bellow the dir with .js extension
+        walk(from, function(file, next){
+          next(null, {path: file});
+        }, function(err, files){
+          // get all dependencies (it will be slow...)
+          var fileDeps = {};
+          async.forEach(files, function(file, next){
+            findFilesDependingOn(tree, file.path, function(err, files){
+              if(err) return next(err);
+              fileDeps[file.path] = files;
+              next(null)
+            });
+          }, function(err){
+            if(err) return callback(err);
+            callback(null, {files: files, deps: fileDeps});
+          })
         })
-      })
+      });
     },
     "POST /folder": function(data, callback) {
-      var tree = runtime.currentDirectory.refresh().tree;
-      var from = runtime.currentDirectory.pathToNode(data.from);
-      var getToPath = function(filepath) {
-        return data.to+filepath.replace(data.from, "")
-      }
-      var counter = _.keys(data.entries.deps).length;
-      var changes = [];
-      var resolveForReal = function(f){
-        return f.replace(data.from, data.to);
-      }
-      var next = function(filepath, c){
-        changes = changes.concat(c).concat([{path: filepath}]);
-        counter -= 1;
-        if(counter == 0) {
-          shelljs.rm('-rf', data.from);
-          callback(null, changes);
+      runtime.currentDirectory.refresh(function(err, currentDirectory){
+        if(err) return callback(err);
+        var from = runtime.currentDirectory.pathToNode(data.from);
+        var getToPath = function(filepath) {
+          return data.to+filepath.replace(data.from, "")
         }
-      }
-      shelljs.cp('-Rf', data.from+"/*", data.to);
-      for(var key in data.entries.deps) {
-        (function(filepath, entries){
-          refractorFile(filepath, getToPath(filepath), entries, resolveForReal, function(err, changes){
-            if(err) console.error(err);
-            next(filepath, changes);
-          })  
-        })(key, data.entries.deps[key]);
-      }
+        var counter = _.keys(data.entries.deps).length;
+        var changes = [];
+        var resolveForReal = function(f){
+          return f.replace(data.from, data.to);
+        }
+        var next = function(err, filepath, c){
+          changes = changes.concat(c).concat([{path: filepath}]);
+          counter -= 1;
+          if(counter == 0) {
+            if(!err)
+              shelljs.rm('-rf', data.from);
+            callback(err, changes);
+          }
+        }
+        shelljs.cp('-Rf', data.from+"/*", data.to);
+        for(var key in data.entries.deps) {
+          (function(filepath, entries){
+            refractorFile(filepath, getToPath(filepath), entries, resolveForReal, function(err, changes){
+              next(err, filepath, changes);
+            })  
+          })(key, data.entries.deps[key]);
+        }
+      });
     }
   }
 }

@@ -13,7 +13,8 @@
     "glob": "3.1.14",
     "async": "0.1.22",
     "shelljs": "0.1.2",
-    "required": "0.3.1"
+    "required": "0.3.1",
+    "git-wrapper": "0.1.0"
   },
   "devDependencies": {},
   "optionalDependencies": {},

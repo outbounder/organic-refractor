@@ -1,4 +1,4 @@
-var Mainframe = require("./views/mainframe/index.js");
+var Mainframe = require("./views/mainframe");
 
 module.exports = Backbone.Router.extend({
 
