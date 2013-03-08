@@ -19,4 +19,3 @@ var instance = new WebCell(null, function(){
     }  
   })
 });
-

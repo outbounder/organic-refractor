@@ -12,6 +12,7 @@ module.exports = Backbone.View.extend({
     var self = this;
     var from = this.model.get("path");
     var eventName = "GET /refractor/"+type;
+    this.startMoment = moment();
     runtime.plasma.emit(eventName, {from: from}, function(err, files){
       if(type == "folder") {
         self.entries = files;
@@ -26,6 +27,7 @@ module.exports = Backbone.View.extend({
         self.$(".files").html(self.items({collection: self.collection}));
       else
         self.$(".files").html("no files related found");
+      self.$(".time").html(moment(self.startMoment).fromNow());
     });
   },
   showFile: function(e){
