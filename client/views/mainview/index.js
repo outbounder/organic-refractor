@@ -94,6 +94,7 @@ module.exports = Backbone.View.extend({
 
   render: function(){
     var self = this;
+    console.log("RENDER");
 
     this.$el.html(this.template({
       model: this.model

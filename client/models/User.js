@@ -9,5 +9,6 @@ module.exports = Backbone.Model.extend({
       this.currentDirectory = new CurrentDirectory({entries: data.tree});
     else
       this.currentDirectory.set("entries", data.tree, {silent: true});
+    return data;
   }
 });
