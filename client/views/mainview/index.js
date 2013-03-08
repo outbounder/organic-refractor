@@ -7,7 +7,7 @@ var RelatedRequest = require("../actions/related");
 
 module.exports = Backbone.View.extend({
   template: jadeCompile(require("./index.jade")),
-  treeNodeMenu: jadeCompile(require("./treeNodeMenu.jade")),
+  treeNodeMenu: jadeCompile(require("./treeMenuItem.jade")),
 
   events: {
     "mouseover .node": "showMenu",
@@ -54,7 +54,7 @@ module.exports = Backbone.View.extend({
       this.currentActionRequest.remove();
 
     var pathToChange = $(e.currentTarget).attr("data-path");
-    
+    var $tree = self.$(".treeview");
     var node = $tree.tree('getNodeById', pathToChange);
 
     var view = this.currentActionRequest = new RenameActionRequest({model: new Backbone.Model(node)});
@@ -94,7 +94,6 @@ module.exports = Backbone.View.extend({
 
   render: function(){
     var self = this;
-    console.log("RENDER");
 
     this.$el.html(this.template({
       model: this.model
