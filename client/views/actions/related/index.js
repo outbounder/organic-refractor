@@ -24,7 +24,16 @@ module.exports = Backbone.View.extend({
         self.collection = files;
         
       if(self.collection.length > 0)
-        self.$(".files").html(self.items({collection: self.collection}));
+        self.$(".files").html(self.items({
+          collection: self.collection,
+          relative: function(file) {
+            var v = path.relative(from, file);
+            if(v.indexOf(".") !== 0 && v.indexOf("/") !== 0)
+              return "./"+v;
+            else
+              return v;
+          }
+        }));
       else
         self.$(".files").html("no files related found");
       self.$(".time").html(moment(self.startMoment).fromNow());
