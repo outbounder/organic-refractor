@@ -1,5 +1,6 @@
 var runtime = require("../models/runtime");
-var required = require('../xlib/required');
+var child_process = require("child_process");
+
 var path = require("path");
 var async = require("async");
 var shelljs = require('shelljs');
@@ -25,29 +26,14 @@ var walk = function(root, collector, callback, list, walkData){
   }
 }
 
-var dependingFilesCollector = function(from){
-  return function(file, next){
-    if(path.extname(file) != ".js") return next();
-    required(file, {ignoreMissing: true}, function(err, deps){
-      if(!deps || err) return next(null);
-      for(var i = 0; i<deps.length; i++)
-        if(deps[i].filename == from) {
-          var data = {
-            path: file,
-            filename: deps[i].filename,
-            id: deps[i].id
-          }
-          return next(null, data);
-        }
-      next();
-    })
-  }
-}
-
 var findFilesDependingOn = function(tree, from, callback){
-  walk(tree, dependingFilesCollector(from), function(err, list){
-    callback(err, list);
-  })
+  var child = child_process.fork(__dirname+"/../findFilesDependingOn.js");
+  
+  child.on("message", function(msg){
+    callback(msg.err, msg.list);
+  });
+
+  child.send({tree: tree, from: from});
 }
 
 var refractorFileDependency = function(to, resolveForReal){
@@ -113,9 +99,7 @@ module.exports = function(config){
       runtime.currentDirectory.refresh(function(err, currentDirectory){
         if(err) return callback(err);
         var tree = currentDirectory.tree;
-          findFilesDependingOn(tree, data.from, function(err, files){
-          callback(err, files);
-        });
+          findFilesDependingOn(tree, data.from, callback);
       });
     },
     "POST /file": function(data, callback) {
