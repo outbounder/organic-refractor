@@ -14,7 +14,8 @@
     "async": "0.1.22",
     "shelljs": "0.1.2",
     "required": "0.3.1",
-    "git-wrapper": "0.1.0"
+    "git-wrapper": "0.1.0",
+    "fork-pool": "latest"
   },
   "devDependencies": {},
   "optionalDependencies": {},

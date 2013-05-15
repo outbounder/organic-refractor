@@ -1,4 +1,6 @@
-var required = require('../xlib/required');
+var required = require('./xlib/required');
+var path = require("path");
+var _cache = {};
 
 var walk = function(root, collector, callback, list, walkData){
   walkData = walkData || {counter: 0};
@@ -22,8 +24,25 @@ var walk = function(root, collector, callback, list, walkData){
 var dependingFilesCollector = function(from){
   return function(file, next){
     if(path.extname(file) != ".js") return next();
+    if(_cache[file]) {
+      var deps = _cache[file];
+      for(var i = 0; i<deps.length; i++)
+        if(deps[i].filename == from) {
+          var data = {
+            path: file,
+            filename: deps[i].filename,
+            id: deps[i].id
+          }
+          return next(null, data);
+        }
+      return next();
+    }
+
     required(file, {ignoreMissing: true}, function(err, deps){
       if(!deps || err) return next(null);
+
+      _cache[file] = deps;
+
       for(var i = 0; i<deps.length; i++)
         if(deps[i].filename == from) {
           var data = {
@@ -41,6 +60,5 @@ var dependingFilesCollector = function(from){
 process.on("message", function(msg){
   walk(msg.tree, dependingFilesCollector(msg.from), function(err, list){  
     process.send({err: err, list: list});
-    process.exit(0);
   });
 });

@@ -1,4 +1,5 @@
 var runtime = require("../models/runtime");
+var required = require('../xlib/required');
 var child_process = require("child_process");
 
 var path = require("path");
@@ -26,14 +27,14 @@ var walk = function(root, collector, callback, list, walkData){
   }
 }
 
-var findFilesDependingOn = function(tree, from, callback){
-  var child = child_process.fork(__dirname+"/../findFilesDependingOn.js");
-  
-  child.on("message", function(msg){
-    callback(msg.err, msg.list);
-  });
+var pool = new (require("fork-pool"))(__dirname+"/../findFilesDependingOn.js", null, null, {});
 
-  child.send({tree: tree, from: from});
+
+var findFilesDependingOn = function(tree, from, callback){
+  pool.enqueue({tree: tree, from: from}, function(err, a){
+    if(err) return callback(err);
+    callback(err, a.stdout);
+  });
 }
 
 var refractorFileDependency = function(to, resolveForReal){
@@ -99,7 +100,7 @@ module.exports = function(config){
       runtime.currentDirectory.refresh(function(err, currentDirectory){
         if(err) return callback(err);
         var tree = currentDirectory.tree;
-          findFilesDependingOn(tree, data.from, callback);
+        findFilesDependingOn(tree, data.from, callback);
       });
     },
     "POST /file": function(data, callback) {
@@ -122,7 +123,6 @@ module.exports = function(config){
         walk(from, function(file, next){
           next(null, {path: file});
         }, function(err, files){
-          // get all dependencies (it will be slow...)
           var fileDeps = {};
           async.forEach(files, function(file, next){
             findFilesDependingOn(tree, file.path, function(err, files){

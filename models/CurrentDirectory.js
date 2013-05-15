@@ -19,6 +19,9 @@ var dirTree = function(filename) {
       info.type = "folder";
       info.children = fs.readdirSync(filename).map(function(child) {
         if(child == "node_modules") return;
+        if(child == "vendor") return;
+        if(child == "assets-store") return;
+        if(child == "spec") return;
         if(child.indexOf(".") === 0) return;
         
         return dirTree(filename + '/' + child);
