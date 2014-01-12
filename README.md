@@ -1,32 +1,16 @@
+# What is this in short
+
+implementation of organelle for refactoring source code based on CommonJS' `require`s with relative paths bundled with UI.
+
+**Attention** this may break your source code. Use always covered by [git](http://git-scm.com/) or other source versioning system.
+
 # Requirements #
+
 * nodejs v0.8.14 or above
 
-# How to install #
+# setup
 
-Copy files from zip archive to `target` directory.
-
-$ cd `target`
-$ npm install
-
-## if you don't have angel yet ##
-
-$ npm install organic-angel -g 
-
-# How to start #
-
-$ cd `target`
-$ angel Cell start archconsole.js
-
-# How to stop #
-
-$ cd `target`
-$ angel Cell stop archconsole.js
-
-# How to restart #
-
-$ cd `target`
-$ angel Cell restart archconsole.js
-
-# How to use #
-
-start && open http://localhost:3333/
+    $ git clone https://github.com/outbounder/organic-refractor.git
+    $ cd organic-refractor
+    $ npm install
+    $ node refractor.js && open-browser @ http://localhost:3334
