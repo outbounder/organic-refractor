@@ -1,5 +1,3 @@
-var path = require("path");
-
 module.exports = Backbone.View.extend({
   template: jadeCompile(require("./index.jade")),
   events: {

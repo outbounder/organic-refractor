@@ -2,12 +2,7 @@ require("./../client/vendor/index.js");
 config = require("config")
 
 jadeCompile = function(path){
-  var compiled = jade.compile(path);
-  return function(data) {
-    data = data || {};
-    data.t = $.t;
-    return compiled(data);
-  }
+  return path
 };
 
 runtime = {};

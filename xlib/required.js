@@ -1,3 +1,4 @@
+// 'forked' version of "required" lib
 
 // builtin
 var priv_module = require('module');

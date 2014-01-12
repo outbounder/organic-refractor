@@ -4,9 +4,7 @@
     "useCache": true,
     "debug": true,
     "uglify": true,
-    "plugins": [{
-      "source": "/client-plugins/ConfigAndTemplates"
-    }]
+    "plugins": ["/client-plugins/jade", "/client-plugins/config"]
   },
   "RenderPage": {
     "source": "node_modules/organic-webcell/plasma/RenderPage",
